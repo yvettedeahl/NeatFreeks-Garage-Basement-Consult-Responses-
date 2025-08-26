@@ -1,0 +1,779 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NeatFreeks Consultation</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f3f4f6; /* Light gray background */
+            color: #374151; /* Dark gray text */
+        }
+        .form-section {
+            display: none; /* Hidden by default */
+        }
+        .form-section.active {
+            display: block; /* Show active section */
+        }
+        /* Custom radio/checkbox styling to be more visible */
+        input[type="radio"], input[type="checkbox"] {
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            appearance: none;
+            display: inline-block;
+            width: 1.25rem;
+            height: 1.25rem;
+            border: 2px solid #6b7280; /* Gray border */
+            border-radius: 0.375rem; /* Rounded corners for checkbox */
+            vertical-align: middle;
+            position: relative;
+            cursor: pointer;
+            outline: none;
+            margin-right: 0.5rem;
+            flex-shrink: 0; /* Prevent shrinking in flex container */
+        }
+        input[type="radio"] {
+            border-radius: 50%; /* Circle for radio */
+        }
+        input[type="radio"]:checked, input[type="checkbox"]:checked {
+            background-color: #3b82f6; /* Blue background when checked */
+            border-color: #3b82f6;
+        }
+        input[type="radio"]:checked::after {
+            content: '';
+            display: block;
+            width: 0.625rem;
+            height: 0.625rem;
+            border-radius: 50%;
+            background: white;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
+        input[type="checkbox"]:checked::after {
+            content: '✓';
+            display: block;
+            color: white;
+            font-size: 0.75rem;
+            text-align: center;
+            line-height: 1.25rem;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
+        /* Style for required asterisk */
+        .required::after {
+            content: ' *';
+            color: #ef4444; /* Red color for asterisk */
+        }
+        .error-message {
+            color: #ef4444; /* Red color for error messages */
+            font-size: 0.75rem;
+            margin-top: 0.25rem;
+            display: none;
+        }
+        .border-red-500 {
+            border-color: #ef4444 !important;
+        }
+    </style>
+</head>
+<body class="p-4 sm:p-6 lg:p-8 flex items-center justify-center min-h-screen">
+    <div class="max-w-3xl w-full bg-white shadow-lg rounded-xl p-6 sm:p-8 lg:p-10 border border-gray-200 flex flex-col">
+        <!-- Header Section with Logo -->
+        <div class="w-full text-center pb-6 border-b border-gray-200 mb-8">
+            <img src="https://i.imgur.com/BMdQjlC.png" alt="NeatFreeks Logo" class="mx-auto mb-4 w-48 sm:w-64 max-w-full h-auto rounded-lg">
+            <h1 class="text-3xl sm:text-4xl font-bold text-gray-800 mb-2">NeatFreeks — Garage + Basement Organization Consultation</h1>
+            <p class="text-center text-gray-600 sm:text-lg">Tell us how you’d like these spaces to work for you. This quick consult helps us tailor the right mix of decluttering, planning, and storage solutions.</p>
+        </div>
+
+        <!-- Progress Bar -->
+        <div class="w-full bg-gray-200 rounded-full h-2.5 mb-8">
+            <div id="progressBar" class="bg-blue-600 h-2.5 rounded-full transition-all duration-300 ease-in-out" style="width: 0%;"></div>
+        </div>
+
+        <form id="neatFreeksForm" class="space-y-6 flex-grow">
+            <!-- Section 1: Contact Info -->
+            <div class="form-section active" data-section-index="0">
+                <h2 class="text-2xl font-semibold mb-6 text-gray-700 border-b pb-2">Contact Info</h2>
+                <div class="mb-5">
+                    <label for="fullName" class="block text-sm font-medium text-gray-700 required">Full Name</label>
+                    <input type="text" id="fullName" name="fullName" class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm transition-colors duration-200" required>
+                    <div id="error-fullName" class="error-message"></div>
+                </div>
+                <div class="mb-5">
+                    <label for="phoneNumber" class="block text-sm font-medium text-gray-700 required">Phone Number</label>
+                    <input type="tel" id="phoneNumber" name="phoneNumber" class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm transition-colors duration-200" required>
+                    <p class="mt-2 text-xs text-gray-500">Best number for quick questions / approvals.</p>
+                    <div id="error-phoneNumber" class="error-message"></div>
+                </div>
+                <div class="mb-5">
+                    <label for="alternateEmail" class="block text-sm font-medium text-gray-700">Alternate Email (optional)</label>
+                    <input type="email" id="alternateEmail" name="alternateEmail" class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm transition-colors duration-200">
+                    <p class="mt-2 text-xs text-gray-500">If provided, must be a valid email.</p>
+                    <div id="error-alternateEmail" class="error-message"></div>
+                </div>
+            </div>
+
+            <!-- Section 2: Spaces to be organized -->
+            <div class="form-section" data-section-index="1">
+                <h2 class="text-2xl font-semibold mb-6 text-gray-700 border-b pb-2">Spaces to be organized</h2>
+                <div class="mb-5">
+                    <p class="block text-sm font-medium text-gray-700 mb-2 required">Which spaces should we organize?</p>
+                    <div class="space-y-3" id="spaces-group">
+                        <label class="flex items-center text-gray-800 cursor-pointer">
+                            <input type="checkbox" name="spaces" value="Garage" class="form-checkbox text-blue-600 rounded-md focus:ring-blue-500" required>
+                            <span>Garage</span>
+                        </label>
+                        <label class="flex items-center text-gray-800 cursor-pointer">
+                            <input type="checkbox" name="spaces" value="Basement storage area(s)" class="form-checkbox text-blue-600 rounded-md focus:ring-blue-500">
+                            <span>Basement storage area(s)</span>
+                        </label>
+                        <label class="flex items-center text-gray-800 cursor-pointer">
+                            <input type="checkbox" name="spaces" value="Both" class="form-checkbox text-blue-600 rounded-md focus:ring-blue-500">
+                            <span>Both</span>
+                        </label>
+                    </div>
+                    <div id="error-spaces" class="error-message"></div>
+                </div>
+            </div>
+
+            <!-- Section 3: Current situation -->
+            <div class="form-section" data-section-index="2">
+                <h2 class="text-2xl font-semibold mb-6 text-gray-700 border-b pb-2">Current Situation</h2>
+                <div class="mb-5">
+                    <p class="block text-sm font-medium text-gray-700 mb-2 required">How would you describe the space right now?</p>
+                    <div class="space-y-3" id="currentSituation-group">
+                        <label class="flex items-center text-gray-800 cursor-pointer">
+                            <input type="radio" name="currentSituation" value="Lightly cluttered — mostly needs better systems" class="form-radio text-blue-600" required>
+                            <span>Lightly cluttered — mostly needs better systems</span>
+                        </label>
+                        <label class="flex items-center text-gray-800 cursor-pointer">
+                            <input type="radio" name="currentSituation" value="Packed — floor to ceiling, hard to find things" class="form-radio text-blue-600">
+                            <span>Packed — floor to ceiling, hard to find things</span>
+                        </label>
+                        <label class="flex items-center text-gray-800 cursor-pointer">
+                            <input type="radio" name="currentSituation" value="Mixed — some organized areas, some chaos" class="form-radio text-blue-600">
+                            <span>Mixed — some organized areas, some chaos</span>
+                        </label>
+                    </div>
+                    <div id="error-currentSituation" class="error-message"></div>
+                </div>
+            </div>
+
+            <!-- Section 4: Goals for the Space -->
+            <div class="form-section" data-section-index="3">
+                <h2 class="text-2xl font-semibold mb-6 text-gray-700 border-b pb-2">Goals for the Space</h2>
+                <div class="mb-5">
+                    <p class="block text-sm font-medium text-gray-700 mb-2 required">What do you want this space to do for you once organized?</p>
+                    <div class="space-y-3" id="goals-group">
+                        <label class="flex items-center text-gray-800 cursor-pointer">
+                            <input type="checkbox" name="goals" value="Clear floor space (fit car / open walkway)" class="form-checkbox text-blue-600 rounded-md focus:ring-blue-500" required>
+                            <span>Clear floor space (fit car / open walkway)</span>
+                        </label>
+                        <label class="flex items-center text-gray-800 cursor-pointer">
+                            <input type="checkbox" name="goals" value="Easy access to stored items" class="form-checkbox text-blue-600 rounded-md focus:ring-blue-500">
+                            <span>Easy access to stored items</span>
+                        </label>
+                        <label class="flex items-center text-gray-800 cursor-pointer">
+                            <input type="checkbox" name="goals" value="Seasonal storage (holiday, sports, etc.)" class="form-checkbox text-blue-600 rounded-md focus:ring-blue-500">
+                            <span>Seasonal storage (holiday, sports, etc.)</span>
+                        </label>
+                        <label class="flex items-center text-gray-800 cursor-pointer">
+                            <input type="checkbox" name="goals" value="Tool/workshop area" class="form-checkbox text-blue-600 rounded-md focus:ring-blue-500">
+                            <span>Tool/workshop area</span>
+                        </label>
+                        <label class="flex items-center text-gray-800 cursor-pointer">
+                            <input type="checkbox" name="goals" value="Overflow pantry / household supplies" class="form-checkbox text-blue-600 rounded-md focus:ring-blue-500">
+                            <span>Overflow pantry / household supplies</span>
+                        </label>
+                        <label class="flex items-center text-gray-800 cursor-pointer">
+                            <input type="checkbox" name="goals" value="Kid/family storage (toys, gear, etc.)" class="form-checkbox text-blue-600 rounded-md focus:ring-blue-500">
+                            <span>Kid/family storage (toys, gear, etc.)</span>
+                        </label>
+                        <label class="flex items-center text-gray-800 cursor-pointer">
+                            <input type="checkbox" name="goals" id="otherGoalCheckbox" value="Other" class="form-checkbox text-blue-600 rounded-md focus:ring-blue-500">
+                            <span>Other (add details below)</span>
+                        </label>
+                    </div>
+                    <div id="error-goals" class="error-message"></div>
+                </div>
+                <div class="mb-5" id="otherGoalDetails" style="display: none;">
+                    <label for="otherGoalText" class="block text-sm font-medium text-gray-700">If you selected “Other,” what else do you want this space to support?</label>
+                    <textarea id="otherGoalText" name="otherGoalText" rows="3" class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm transition-colors duration-200"></textarea>
+                </div>
+            </div>
+
+            <!-- Section 5: Service Level Preference -->
+            <div class="form-section" data-section-index="4">
+                <h2 class="text-2xl font-semibold mb-6 text-gray-700 border-b pb-2">Service Level Preference</h2>
+                <div class="mb-5">
+                    <p class="block text-sm font-medium text-gray-700 mb-2 required">Would you like us to…</p>
+                    <div class="space-y-3" id="serviceLevel-group">
+                        <label class="flex items-center text-gray-800 cursor-pointer">
+                            <input type="radio" name="serviceLevel" value="Focus on decluttering & organizing only (we’ll use what you have or what you buy)" class="form-radio text-blue-600" required>
+                            <span>Focus on decluttering & organizing only (we’ll use what you have or what you buy)</span>
+                        </label>
+                        <label class="flex items-center text-gray-800 cursor-pointer">
+                            <input type="radio" name="serviceLevel" value="Provide a full storage solution (we plan, source, and set up racks, bins, and systems)" class="form-radio text-blue-600">
+                            <span>Provide a full storage solution (we plan, source, and set up racks, bins, and systems)</span>
+                        </label>
+                        <label class="flex items-center text-gray-800 cursor-pointer">
+                            <input type="radio" name="serviceLevel" value="Not sure yet — I’d like options after a walkthrough" class="form-radio text-blue-600">
+                            <span>Not sure yet — I’d like options after a walkthrough</span>
+                        </label>
+                    </div>
+                    <div id="error-serviceLevel" class="error-message"></div>
+                </div>
+            </div>
+
+            <!-- Section 6: Storage Style Preferences -->
+            <div class="form-section" data-section-index="5">
+                <h2 class="text-2xl font-semibold mb-6 text-gray-700 border-b pb-2">Storage Style Preferences</h2>
+                <div class="mb-5">
+                    <p class="block text-sm font-medium text-gray-700 mb-2 required">Which storage style(s) fit you best?</p>
+                    <div class="space-y-3" id="storageStyle-group">
+                        <label class="flex items-center text-gray-800 cursor-pointer">
+                            <input type="checkbox" name="storageStyle" value="Affordable, functional basics (wire racks, plastic bins)" class="form-checkbox text-blue-600 rounded-md focus:ring-blue-500" required>
+                            <span>Affordable, functional basics (wire racks, plastic bins)</span>
+                        </label>
+                        <label class="flex items-center text-gray-800 cursor-pointer">
+                            <input type="checkbox" name="storageStyle" value="More polished/uniform look (matching bins, labels, neat lines)" class="form-checkbox text-blue-600 rounded-md focus:ring-blue-500">
+                            <span>More polished/uniform look (matching bins, labels, neat lines)</span>
+                        </label>
+                        <label class="flex items-center text-gray-800 cursor-pointer">
+                            <input type="checkbox" name="storageStyle" value="Heavy-duty/industrial (metal shelving, wall racks, pegboards)" class="form-checkbox text-blue-600 rounded-md focus:ring-blue-500">
+                            <span>Heavy-duty/industrial (metal shelving, wall racks, pegboards)</span>
+                        </label>
+                        <label class="flex items-center text-gray-800 cursor-pointer">
+                            <input type="checkbox" name="storageStyle" value="Open to recommendations" class="form-checkbox text-blue-600 rounded-md focus:ring-blue-500">
+                            <span>Open to recommendations</span>
+                        </label>
+                    </div>
+                    <div id="error-storageStyle" class="error-message"></div>
+                </div>
+            </div>
+
+            <!-- Section 7: Decluttering Needs -->
+            <div class="form-section" data-section-index="6">
+                <h2 class="text-2xl font-semibold mb-6 text-gray-700 border-b pb-2">Decluttering Needs</h2>
+                <div class="mb-5">
+                    <p class="block text-sm font-medium text-gray-700 mb-2 required">How much sorting do you think we’ll need to do?</p>
+                    <div class="space-y-3" id="declutteringNeeds-group">
+                        <label class="flex items-center text-gray-800 cursor-pointer">
+                            <input type="radio" name="declutteringNeeds" value="Light — just a few categories" class="form-radio text-blue-600" required>
+                            <span>Light — just a few categories</span>
+                        </label>
+                        <label class="flex items-center text-gray-800 cursor-pointer">
+                            <input type="radio" name="declutteringNeeds" value="Medium — some tough piles" class="form-radio text-blue-600">
+                            <span>Medium — some tough piles</span>
+                        </label>
+                        <label class="flex items-center text-gray-800 cursor-pointer">
+                            <input type="radio" name="declutteringNeeds" value="Heavy — multiple areas of “what do we even do with this?”" class="form-radio text-blue-600">
+                            <span>Heavy — multiple areas of “what do we even do with this?”</span>
+                        </label>
+                    </div>
+                    <div id="error-declutteringNeeds" class="error-message"></div>
+                </div>
+            </div>
+
+            <!-- Section 8: Decision-Making Style -->
+            <div class="form-section" data-section-index="7">
+                <h2 class="text-2xl font-semibold mb-6 text-gray-700 border-b pb-2">Decision-Making Style</h2>
+                <div class="mb-5">
+                    <p class="block text-sm font-medium text-gray-700 mb-2 required">When deciding what stays or goes:</p>
+                    <div class="space-y-3" id="decisionMaking-group">
+                        <label class="flex items-center text-gray-800 cursor-pointer">
+                            <input type="radio" name="decisionMaking" value="I want to be hands-on, making decisions with the team" class="form-radio text-blue-600" required>
+                            <span>I want to be hands-on, making decisions with the team</span>
+                        </label>
+                        <label class="flex items-center text-gray-800 cursor-pointer">
+                            <input type="radio" name="decisionMaking" value="I’d like guidance but prefer you to drive the process" class="form-radio text-blue-600">
+                            <span>I’d like guidance but prefer you to drive the process</span>
+                        </label>
+                        <label class="flex items-center text-gray-800 cursor-pointer">
+                            <input type="radio" name="decisionMaking" value="Please handle as much as possible, with minimal involvement" class="form-radio text-blue-600">
+                            <span>Please handle as much as possible, with minimal involvement</span>
+                        </label>
+                    </div>
+                    <div id="error-decisionMaking" class="error-message"></div>
+                </div>
+            </div>
+
+            <!-- Section 9: Supplies on Hand -->
+            <div class="form-section" data-section-index="8">
+                <h2 class="text-2xl font-semibold mb-6 text-gray-700 border-b pb-2">Supplies on Hand</h2>
+                <div class="mb-5">
+                    <p class="block text-sm font-medium text-gray-700 mb-2 required">Do you already have racks, bins, or shelving for us to use?</p>
+                    <div class="space-y-3" id="suppliesOnHand-group">
+                        <label class="flex items-center text-gray-800 cursor-pointer">
+                            <input type="radio" name="suppliesOnHand" value="Yes, I have some supplies already" class="form-radio text-blue-600" required>
+                            <span>Yes, I have some supplies already</span>
+                        </label>
+                        <label class="flex items-center text-gray-800 cursor-pointer">
+                            <input type="radio" name="suppliesOnHand" value="No, I’d like you to provide everything" class="form-radio text-blue-600">
+                            <span>No, I’d like you to provide everything</span>
+                        </label>
+                        <label class="flex items-center text-gray-800 cursor-pointer">
+                            <input type="radio" name="suppliesOnHand" value="Some — may need additional pieces" class="form-radio text-blue-600">
+                            <span>Some — may need additional pieces</span>
+                        </label>
+                    </div>
+                    <div id="error-suppliesOnHand" class="error-message"></div>
+                </div>
+            </div>
+
+            <!-- Section 10: Budget & Timeline -->
+            <div class="form-section" data-section-index="9">
+                <h2 class="text-2xl font-semibold mb-6 text-gray-700 border-b pb-2">Budget & Timeline</h2>
+                <div class="mb-5">
+                    <p class="block text-sm font-medium text-gray-700 mb-2 required">Budget comfort zone (labor + supplies)</p>
+                    <div class="space-y-3" id="budget-group">
+                        <label class="flex items-center text-gray-800 cursor-pointer">
+                            <input type="radio" name="budget" value="$500–$1,000 — light reset with affordable shelving/bins" class="form-radio text-blue-600" required>
+                            <span>$500–$1,000 — light reset with affordable shelving/bins</span>
+                        </label>
+                        <label class="flex items-center text-gray-800 cursor-pointer">
+                            <input type="radio" name="budget" value="$1,000–$2,000 — fuller reset with multiple systems" class="form-radio text-blue-600">
+                            <span>$1000–$2000 — fuller reset with multiple systems</span>
+                        </label>
+                        <label class="flex items-center text-gray-800 cursor-pointer">
+                            <input type="radio" name="budget" value="$2,000+ — full transformation with premium setups" class="form-radio text-blue-600">
+                            <span>$2000+ — full transformation with premium setups</span>
+                        </label>
+                        <label class="flex items-center text-gray-800 cursor-pointer">
+                            <input type="radio" name="budget" value="Not sure — please provide a range first" class="form-radio text-blue-600">
+                            <span>Not sure — please provide a range first</span>
+                        </label>
+                    </div>
+                    <div id="error-budget" class="error-message"></div>
+                </div>
+                <div class="mb-5">
+                    <p class="block text-sm font-medium text-gray-700 mb-2 required">Timeline</p>
+                    <div class="space-y-3" id="timeline-group">
+                        <label class="flex items-center text-gray-800 cursor-pointer">
+                            <input type="radio" name="timeline" value="ASAP" class="form-radio text-blue-600" required>
+                            <span>ASAP</span>
+                        </label>
+                        <label class="flex items-center text-gray-800 cursor-pointer">
+                            <input type="radio" name="timeline" value="Within 2 weeks" class="form-radio text-blue-600">
+                            <span>Within 2 weeks</span>
+                        </label>
+                        <label class="flex items-center text-gray-800 cursor-pointer">
+                            <input type="radio" name="timeline" value="Flexible" class="form-radio text-blue-600">
+                            <span>Flexible</span>
+                        </label>
+                    </div>
+                    <div id="error-timeline" class="error-message"></div>
+                </div>
+            </div>
+
+            <!-- Section 11: Notes & Photos -->
+            <div class="form-section" data-section-index="10">
+                <h2 class="text-2xl font-semibold mb-6 text-gray-700 border-b pb-2">Notes & Photos</h2>
+                <div class="mb-5">
+                    <label for="additionalNotes" class="block text-sm font-medium text-gray-700">Anything else you’d like us to know?</label>
+                    <textarea id="additionalNotes" name="additionalNotes" rows="4" class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm transition-colors duration-200"></textarea>
+                    <p class="mt-2 text-xs text-gray-500">Examples: kid-friendly bins, must fit bikes + car, already own heavy shelving, HOA constraints, stairs/access notes.</p>
+                </div>
+                <!-- File upload (commented out as per original script, can be uncommented) -->
+                <!--
+                <div class="mb-5">
+                    <label for="photos" class="block text-sm font-medium text-gray-700">Optional: Upload photos of your space</label>
+                    <input type="file" id="photos" name="photos" multiple accept="image/*" class="mt-1 block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 cursor-pointer">
+                    <p class="mt-2 text-xs text-gray-500">Up to 10 images, 25MB each</p>
+                </div>
+                -->
+                <div class="flex justify-end mt-6">
+                    <button type="button" id="getIdeasBtn" class="px-6 py-3 bg-purple-600 text-white font-medium rounded-lg shadow-md hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-opacity-75 transition-colors duration-200">
+                        ✨ Get Personalized Organization Ideas
+                    </button>
+                </div>
+            </div>
+
+            <!-- Navigation Buttons -->
+            <div class="flex justify-between mt-8 pt-6 border-t border-gray-200">
+                <button type="button" id="prevBtn" class="px-6 py-3 bg-gray-300 text-gray-800 font-medium rounded-lg shadow-sm hover:bg-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-opacity-75 transition-colors duration-200" style="display: none;">Previous</button>
+                <button type="button" id="nextBtn" class="ml-auto px-6 py-3 bg-blue-600 text-white font-medium rounded-lg shadow-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-75 transition-colors duration-200">Next</button>
+                <button type="submit" id="submitBtn" class="ml-auto px-6 py-3 bg-green-600 text-white font-medium rounded-lg shadow-md hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-opacity-75 transition-colors duration-200" style="display: none;">Submit</button>
+            </div>
+        </form>
+
+        <!-- Confirmation Message Box -->
+        <div id="confirmationMessage" class="fixed inset-0 bg-gray-600 bg-opacity-75 flex items-center justify-center p-4" style="display: none;">
+            <div class="bg-white rounded-lg shadow-xl p-8 max-w-md w-full text-center">
+                <h3 class="text-2xl font-bold text-gray-800 mb-4">Thanks!</h3>
+                <p class="text-gray-700 mb-6">We’ll review your preferences and follow up with a plan + estimate options.</p>
+                <button type="button" onclick="document.getElementById('confirmationMessage').style.display='none'; location.reload();" class="px-6 py-3 bg-blue-600 text-white font-medium rounded-lg shadow-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-75 transition-colors duration-200">Close</button>
+            </div>
+        </div>
+
+        <!-- Submission Error Message Box -->
+        <div id="submissionErrorMessage" class="fixed inset-0 bg-gray-600 bg-opacity-75 flex items-center justify-center p-4" style="display: none;">
+            <div class="bg-white rounded-lg shadow-xl p-8 max-w-md w-full text-center">
+                <h3 class="text-2xl font-bold text-red-600 mb-4">Submission Failed!</h3>
+                <p id="submissionErrorText" class="text-gray-700 mb-6">There was an issue submitting your form. Please try again later.</p>
+                <button type="button" onclick="document.getElementById('submissionErrorMessage').style.display='none';" class="px-6 py-3 bg-red-600 text-white font-medium rounded-lg shadow-md hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-opacity-75 transition-colors duration-200">Close</button>
+            </div>
+        </div>
+
+        <!-- LLM Response Modal -->
+        <div id="llmResponseModal" class="fixed inset-0 bg-gray-600 bg-opacity-75 flex items-center justify-center p-4" style="display: none;">
+            <div class="bg-white rounded-lg shadow-xl p-8 max-w-2xl w-full text-center">
+                <h3 class="text-2xl font-bold text-gray-800 mb-4">Your Personalized Organization Ideas ✨</h3>
+                <div id="llmResponseContent" class="text-gray-700 mb-6 text-left max-h-96 overflow-y-auto p-2 border border-gray-200 rounded-md">
+                    <!-- LLM generated content will go here -->
+                </div>
+                <div id="llmResponseLoading" class="text-blue-600 flex items-center justify-center mb-4" style="display: none;">
+                    <svg class="animate-spin -ml-1 mr-3 h-5 w-5 text-blue-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                    </svg>
+                    Generating ideas...
+                </div>
+                <button type="button" onclick="document.getElementById('llmResponseModal').style.display='none';" class="px-6 py-3 bg-blue-600 text-white font-medium rounded-lg shadow-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-75 transition-colors duration-200">Close</button>
+            </div>
+        </div>
+
+
+        <!-- Footer Section -->
+        <div class="mt-8 pt-6 border-t border-gray-200 bg-[#012454] text-white p-4 sm:p-6 text-center rounded-b-xl -mx-6 -mb-6">
+            <p>&copy; 2025 NeatFreeks. All rights reserved.</p>
+            <p class="text-sm mt-2">Professional Organization Services</p>
+        </div>
+    </div>
+
+    <script>
+        const formSections = Array.from(document.querySelectorAll('.form-section'));
+        let currentSectionIndex = 0;
+        const progressBar = document.getElementById('progressBar');
+        const prevBtn = document.getElementById('prevBtn');
+        const nextBtn = document.getElementById('nextBtn');
+        const submitBtn = document.getElementById('submitBtn');
+        const getIdeasBtn = document.getElementById('getIdeasBtn');
+        const confirmationMessage = document.getElementById('confirmationMessage');
+        const submissionErrorMessage = document.getElementById('submissionErrorMessage');
+        const submissionErrorText = document.getElementById('submissionErrorText');
+        const neatFreeksForm = document.getElementById('neatFreeksForm');
+        const llmResponseModal = document.getElementById('llmResponseModal');
+        const llmResponseContent = document.getElementById('llmResponseContent');
+        const llmResponseLoading = document.getElementById('llmResponseLoading');
+        const mainContentDiv = document.querySelector('.max-w-3xl');
+
+        // IMPORTANT: Replace this with your deployed Google Apps Script Web App URL
+        const GOOGLE_APPS_SCRIPT_WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbym6v6w1O_xfa9co8hn-Q6tpkov38eCOGlZOMyVG4Rn1ujbOVyvjlHtWQFLip205HRa/exec';
+
+        // Variable to store the last generated AI ideas
+        let lastGeneratedAIIdeas = '';
+
+        // Function to escape HTML for display
+        function escapeHtml(unsafe) {
+            return unsafe
+                .replace(/&/g, "&amp;")
+                .replace(/</g, "&lt;")
+                .replace(/>/g, "&gt;")
+                .replace(/"/g, "&quot;")
+                .replace(/'/g, "&#039;");
+        }
+
+        // Function to make API calls with exponential backoff
+        async function fetchWithExponentialBackoff(url, options, retries = 5, delay = 1000) {
+            try {
+                const response = await fetch(url, options);
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                return await response.json();
+            } catch (error) {
+                if (retries > 0) {
+                    console.warn(`Retrying in ${delay / 1000}s... (${retries} retries left)`);
+                    await new Promise(res => setTimeout(res, delay));
+                    return fetchWithExponentialBackoff(url, options, retries - 1, delay * 2);
+                } else {
+                    throw error;
+                }
+            }
+        }
+
+        function updateFormVisibility() {
+            formSections.forEach((section, index) => {
+                if (index === currentSectionIndex) {
+                    section.classList.add('active');
+                } else {
+                    section.classList.remove('active');
+                }
+            });
+
+            prevBtn.style.display = currentSectionIndex === 0 ? 'none' : 'inline-block';
+            nextBtn.style.display = currentSectionIndex === formSections.length - 1 ? 'none' : 'inline-block';
+            submitBtn.style.display = currentSectionIndex === formSections.length - 1 ? 'inline-block' : 'none';
+
+            getIdeasBtn.style.display = currentSectionIndex === formSections.length - 1 ? 'inline-block' : 'none';
+
+            updateProgressBar();
+            handleConditionalFields();
+
+            mainContentDiv.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+
+        function updateProgressBar() {
+            const progress = ((currentSectionIndex + 1) / formSections.length) * 100;
+            progressBar.style.width = `${progress}%`;
+        }
+
+        function displayErrorMessage(inputElement, message) {
+            let errorDiv;
+            if (inputElement.type === 'radio' || inputElement.type === 'checkbox') {
+                const groupName = inputElement.name;
+                const groupContainer = document.getElementById(`${groupName}-group`);
+                if (groupContainer) {
+                    errorDiv = document.getElementById(`error-${groupName}`);
+                }
+            } else {
+                errorDiv = document.getElementById(`error-${inputElement.id}`);
+            }
+
+            if (errorDiv) {
+                errorDiv.textContent = message;
+                errorDiv.style.display = message ? 'block' : 'none';
+            }
+            if (message) {
+                 inputElement.classList.add('border-red-500');
+            } else {
+                 inputElement.classList.remove('border-red-500');
+            }
+        }
+
+        function clearErrorMessages(section) {
+            const errorMessages = section.querySelectorAll('.error-message');
+            errorMessages.forEach(errorDiv => {
+                errorDiv.textContent = '';
+                errorDiv.style.display = 'none';
+            });
+            const invalidInputs = section.querySelectorAll('.border-red-500');
+            invalidInputs.forEach(input => {
+                input.classList.remove('border-red-500');
+            });
+        }
+
+        function validateCurrentSection() {
+            const activeSection = formSections[currentSectionIndex];
+            clearErrorMessages(activeSection);
+            const requiredInputs = activeSection.querySelectorAll('[required]');
+            let isValid = true;
+
+            requiredInputs.forEach(input => {
+                if (input.type === 'text' || input.type === 'tel' || input.type === 'email' || input.tagName === 'TEXTAREA') {
+                    if (!input.value.trim()) {
+                        isValid = false;
+                        displayErrorMessage(input, 'This field is required.');
+                    } else {
+                        displayErrorMessage(input, '');
+                    }
+                    if (input.id === 'alternateEmail' && input.value.trim() !== '') {
+                        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+                        if (!emailRegex.test(input.value.trim())) {
+                            isValid = false;
+                            displayErrorMessage(input, 'Please enter a valid email address.');
+                        } else {
+                            displayErrorMessage(input, '');
+                        }
+                    }
+                } else if (input.type === 'radio') {
+                    const name = input.name;
+                    const anyChecked = activeSection.querySelector(`input[name="${name}"]:checked`);
+                    if (!anyChecked) {
+                        isValid = false;
+                        displayErrorMessage(input, 'Please select an option.');
+                    } else {
+                        displayErrorMessage(input, '');
+                    }
+                } else if (input.type === 'checkbox') {
+                    const name = input.name;
+                    const checkboxesInGroup = Array.from(activeSection.querySelectorAll(`input[name="${name}"]`));
+                    const anyChecked = checkboxesInGroup.some(cb => cb.checked);
+                    if (!anyChecked) {
+                        isValid = false;
+                        displayErrorMessage(input, 'Please select at least one option.');
+                    } else {
+                        displayErrorMessage(input, '');
+                    }
+                }
+            });
+            return isValid;
+        }
+
+        function handleConditionalFields() {
+            const otherGoalCheckbox = document.getElementById('otherGoalCheckbox');
+            const otherGoalDetails = document.getElementById('otherGoalDetails');
+            if (otherGoalCheckbox) {
+                otherGoalCheckbox.removeEventListener('change', toggleOtherGoalDetails);
+                otherGoalCheckbox.addEventListener('change', toggleOtherGoalDetails);
+                toggleOtherGoalDetails();
+            }
+
+            function toggleOtherGoalDetails() {
+                if (otherGoalCheckbox.checked) {
+                    otherGoalDetails.style.display = 'block';
+                } else {
+                    otherGoalDetails.style.display = 'none';
+                    document.getElementById('otherGoalText').value = '';
+                }
+            }
+        }
+
+        prevBtn.addEventListener('click', () => {
+            if (currentSectionIndex > 0) {
+                currentSectionIndex--;
+                updateFormVisibility();
+            }
+        });
+
+        nextBtn.addEventListener('click', () => {
+            if (validateCurrentSection()) {
+                if (currentSectionIndex < formSections.length - 1) {
+                    currentSectionIndex++;
+                    updateFormVisibility();
+                }
+            }
+        });
+
+        getIdeasBtn.addEventListener('click', async () => {
+            if (!validateCurrentSection()) {
+                return;
+            }
+
+            llmResponseContent.innerHTML = '';
+            llmResponseModal.style.display = 'flex';
+            llmResponseLoading.style.display = 'flex';
+            getIdeasBtn.disabled = true;
+
+            const formData = new FormData(neatFreeksForm);
+            const spaces = formData.getAll('spaces').join(', ') || 'Not specified';
+            const currentSituation = formData.get('currentSituation') || 'Not specified';
+            const goals = formData.getAll('goals').join(', ') || 'Not specified';
+            const otherGoalText = formData.get('otherGoalText') || '';
+            const additionalNotes = formData.get('additionalNotes') || 'None provided.';
+
+            let prompt = `As a professional organization expert for NeatFreeks, generate actionable and personalized organization and decluttering ideas for a client's space.`;
+            prompt += `\n\nClient's Preferences:`;
+            prompt += `\n- Spaces to organize: ${spaces}`;
+            prompt += `\n- Current situation: ${currentSituation}`;
+            prompt += `\n- Desired goals for the space: ${goals}`;
+            if (otherGoalText) {
+                prompt += ` (Other goal details: ${otherGoalText})`;
+            }
+            prompt += `\n- Additional notes from client: ${additionalNotes}`;
+            prompt += `\n\nPlease provide practical, step-by-step suggestions focusing on maximizing space, improving accessibility, and maintaining a clutter-free environment. Keep the tone encouraging and professional. Structure the response with clear headings like "Assessment Summary", "Actionable Steps", and "Suggested Storage Solutions".`;
+
+            try {
+                let chatHistory = [];
+                chatHistory.push({ role: "user", parts: [{ text: prompt }] });
+                const payload = { contents: chatHistory };
+                const apiKey = ""; // Keep as empty string; Canvas will provide
+                const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-05-20:generateContent?key=${apiKey}`;
+
+                const result = await fetchWithExponentialBackoff(apiUrl, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+
+                if (result.candidates && result.candidates.length > 0 &&
+                    result.candidates[0].content && result.candidates[0].content.parts &&
+                    result.candidates[0].content.parts.length > 0) {
+                    const text = result.candidates[0].content.parts[0].text;
+                    lastGeneratedAIIdeas = text; // Store the generated ideas
+                    llmResponseContent.innerHTML = escapeHtml(text).replace(/\n/g, '<br>');
+                } else {
+                    llmResponseContent.innerHTML = 'Sorry, I could not generate ideas at this time. Please try again.';
+                    lastGeneratedAIIdeas = 'No ideas generated.';
+                }
+            } catch (error) {
+                console.error('Error calling Gemini API:', error);
+                llmResponseContent.innerHTML = 'An error occurred while generating ideas. Please try again later.';
+                lastGeneratedAIIdeas = 'Error generating ideas.';
+            } finally {
+                llmResponseLoading.style.display = 'none';
+                getIdeasBtn.disabled = false;
+            }
+        });
+
+
+        neatFreeksForm.addEventListener('submit', async (event) => {
+            event.preventDefault();
+            if (!validateCurrentSection()) {
+                mainContentDiv.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                return;
+            }
+
+            if (GOOGLE_APPS_SCRIPT_WEB_APP_URL === 'YOUR_DEPLOYED_WEB_APP_URL_HERE' || !GOOGLE_APPS_SCRIPT_WEB_APP_URL.startsWith('https://script.google.com/macros/s/')) {
+                alert("Please deploy your Google Apps Script as a Web App and replace 'YOUR_DEPLOYED_WEB_APP_URL_HERE' in the HTML with its URL before submitting.");
+                return;
+            }
+
+            const formData = new FormData(neatFreeksForm);
+            const data = {};
+            for (let [key, value] of formData.entries()) {
+                if (data[key]) {
+                    if (Array.isArray(data[key])) {
+                        data[key].push(value);
+                    } else {
+                        data[key] = [data[key], value];
+                    }
+                } else {
+                    data[key] = value;
+                }
+            }
+
+            for (const key in data) {
+                if (Array.isArray(data[key])) {
+                    data[key] = data[key].join(', ');
+                }
+            }
+
+            // Add the AI-generated ideas to the data payload
+            data.personalizedOrganizationIdeas = lastGeneratedAIIdeas;
+
+            submitBtn.disabled = true;
+            submitBtn.textContent = 'Submitting...';
+
+            try {
+                const response = await fetchWithExponentialBackoff(GOOGLE_APPS_SCRIPT_WEB_APP_URL, {
+                    method: 'POST',
+                    mode: 'cors',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(data),
+                });
+
+                if (response.success) {
+                    confirmationMessage.style.display = 'flex';
+                    neatFreeksForm.reset();
+                    currentSectionIndex = 0;
+                    updateFormVisibility();
+                    lastGeneratedAIIdeas = ''; // Clear stored ideas after submission
+                } else {
+                    submissionErrorText.textContent = response.message || 'There was an issue submitting your form. Please try again later.';
+                    submissionErrorMessage.style.display = 'flex';
+                }
+            } catch (error) {
+                console.error('Submission failed:', error);
+                submissionErrorText.textContent = 'Network error or server unreachable. Please check your connection and try again.';
+                submissionErrorMessage.style.display = 'flex';
+            } finally {
+                submitBtn.disabled = false;
+                submitBtn.textContent = 'Submit';
+            }
+        });
+
+        updateFormVisibility();
+    </script>
+</body>
+</html>
